@@ -31,19 +31,10 @@ module CarrierWave
       def put(path, file, opts = {})
         path.sub!(PATH_PREFIX, '')
 
-        headers = {}
-        headers['Content-Type'] = opts[:content_type] || 'image/jpg'
-        content_disposition = opts[:content_disposition]
-        if content_disposition
-          headers['Content-Disposition'] = content_disposition
-        end
-
-        res = oss_upload_client.bucket_create_object(path, file, headers)
-        if res.success?
-          path_to_url(path)
-        else
-          raise 'Put file failed'
-        end
+        res = oss_upload_client.put_object(path, file: file)
+        path_to_url(path)
+      rescue => e
+        raise "upload failed with #{e}"
       end
 
       # 读取文件
@@ -137,11 +128,13 @@ module CarrierWave
                end
 
         opts = {
-          host: host,
-          bucket: @aliyun_bucket
+          endpoint: host,
+          access_key_id: @aliyun_access_id,
+          access_key_secret: @aliyun_access_key
         }
 
-        @oss_upload_client = ::Aliyun::Oss::Client.new(@aliyun_access_id, @aliyun_access_key, opts)
+        client = ::Aliyun::OSS::Client.new(opts)
+        @oss_upload_client = client.get_bucket(@aliyun_bucket)
       end
     end
   end

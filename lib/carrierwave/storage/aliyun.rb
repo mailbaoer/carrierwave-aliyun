@@ -7,12 +7,8 @@ module CarrierWave
     class Aliyun < Abstract
       def store!(file)
         f = AliyunFile.new(uploader, self, uploader.store_path)
-        headers = {
-          content_type: file.content_type,
-          content_disposition: uploader.try(:content_disposition)
-        }
 
-        f.store(::File.open(file.file), headers)
+        f.store(file.file)
         f
       end
 
