@@ -72,7 +72,7 @@ module CarrierWave
       ##
       # 根据配置返回完整的上传文件的访问地址
       def path_to_url(path, opts = {})
-        if opts[:thumb]
+        if opts.try(:[], :thumb)
           thumb_path = [path, opts[:thumb]].join('')
           [@aliyun_host, thumb_path].join('/')
         else
